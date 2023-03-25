@@ -6,6 +6,6 @@ export default createStyles(() => ({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '5px',
+    gap: '3px',
   },
 }));
