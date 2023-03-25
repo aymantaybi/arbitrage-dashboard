@@ -1,11 +1,11 @@
-import { Welcome } from '../components/Welcome/Welcome';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
+import PairIcon from '../components/PairIcon/PairIcon';
 
 export default function HomePage() {
   return (
     <>
-      <Welcome />
       <ColorSchemeToggle />
+      <PairIcon base="./slp.png" quote="./busd.png" />
     </>
   );
 }
