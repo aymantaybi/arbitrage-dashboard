@@ -17,9 +17,52 @@ export namespace Market {
   }
 }
 
+export interface Status {
+  active: boolean;
+  marginBalances: MarginBalance[];
+  marginOpenOrders: MarginOpenOrder[];
+  onChainBalances: OnChainBalances;
+}
+
+export interface MarginBalance {
+  asset: string;
+  free: string;
+  locked: string;
+}
+
+export interface MarginOpenOrder {
+  clientOrderId: string;
+  cummulativeQuoteQty: string;
+  executedQty: string;
+  icebergQty: string;
+  isWorking: boolean;
+  orderId: number;
+  origQty: string;
+  price: string;
+  side: string;
+  status: string;
+  stopPrice: string;
+  symbol: string;
+  isIsolated: boolean;
+  time: number;
+  timeInForce: string;
+  type: string;
+  updateTime: number;
+}
+
+export interface OnChainBalances {
+  account: string;
+  tokens: TokenBalance[];
+}
+
+export interface TokenBalance {
+  address: string;
+  balance: string;
+  symbol: string;
+}
+
 export interface LightInstance {
-  status: boolean;
-  profit: number;
-  trades: number;
+  id: string;
   market: Market;
+  status: Status;
 }

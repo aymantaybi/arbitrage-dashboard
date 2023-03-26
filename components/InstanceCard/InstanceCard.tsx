@@ -61,20 +61,20 @@ export function InstanceCard(props: InstanceCardProps) {
         </Flex>
         <Flex justify="space-between" align="center" direction="row" wrap="wrap">
           <InstanceDetail
-            label="STATUS"
+            label="ACTIVE"
             value={
               <IconCircleFilled
                 size={18}
                 opacity={0.75}
-                style={{ color: data.status ? 'green' : 'red' }}
+                style={{ color: data.status.active ? 'green' : 'red' }}
               />
             }
           />
-          <InstanceDetail label="PROFIT" value={`${data.profit}$`} />
-          <InstanceDetail label="TRADES" value={data.trades.toString()} />
+          <InstanceDetail label="PROFIT" value={`${0}$`} />
+          <InstanceDetail label="TRADES" value={0} />
         </Flex>
         <Collapse in={isCollapseOpened}>
-          {data.status ? (
+          {data.status.active ? (
             <Flex gap="sm">
               <Button fullWidth variant="light">
                 Restart
