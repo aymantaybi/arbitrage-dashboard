@@ -125,7 +125,14 @@ export default function HomePage() {
         </Header>
       }
     >
-      <SimpleGrid cols={2} h="100%">
+      <SimpleGrid
+        cols={2}
+        h="100%"
+        breakpoints={[
+          { maxWidth: '48rem', cols: 2, spacing: 'sm' },
+          { maxWidth: '36rem', cols: 1, spacing: 'sm' },
+        ]}
+      >
         <InstancesContainer instances={instances} />
         <InstanceController />
       </SimpleGrid>
