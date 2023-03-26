@@ -1,4 +1,4 @@
-import { Stack, Text } from '@mantine/core';
+import { Stack, Text, ScrollArea } from '@mantine/core';
 import React from 'react';
 import { LightInstance } from '../../interfaces';
 import { InstanceCard } from '../InstanceCard/InstanceCard';
@@ -10,13 +10,15 @@ interface InstancesContainerProps {
 export function InstancesContainer(props: InstancesContainerProps) {
   const { instances } = props;
   return (
-    <Stack spacing="xs">
+    <Stack spacing="xs" align="stretch">
       <Text weight={600} opacity={0.5} size={32} p="sm">
         Instances
       </Text>
-      {instances.map((instance) => (
-        <InstanceCard data={instance} />
-      ))}
+      <ScrollArea h="80vh">
+        {instances.map((instance) => (
+          <InstanceCard data={instance} />
+        ))}
+      </ScrollArea>
     </Stack>
   );
 }
