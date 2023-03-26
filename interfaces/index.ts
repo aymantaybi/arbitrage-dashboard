@@ -63,6 +63,7 @@ export interface TokenBalance {
 
 export interface LightInstance {
   id: string;
+  chainId: number;
   market: Market;
   status: Status;
 }

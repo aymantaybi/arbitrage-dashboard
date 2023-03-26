@@ -8,6 +8,7 @@ export default function HomePage() {
   const instances: LightInstance[] = [
     {
       id: '73752229-467d-45cc-9ae5-969a4f4a9d5e',
+      chainId: 2020,
       market: {
         baseToken: {
           address: '0xa8754b9Fa15fc18BB59458815510E40a12cD2014',

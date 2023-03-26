@@ -1,11 +1,11 @@
-import { ActionIcon, Card, Flex, Stack, Text, Button, Collapse } from '@mantine/core';
+import { ActionIcon, Card, Flex, Stack, Text, Button, Collapse, Image } from '@mantine/core';
 import React from 'react';
 import { IconCaretDown, IconCircleFilled, IconCaretUp } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import PairIcon from '../PairIcon/PairIcon';
 import useStyles from './InstanceCard.styles';
 import { LightInstance } from '../../interfaces';
-import { getTokenIconSrc } from '../../helpers';
+import { getChainIconSrc, getTokenIconSrc } from '../../helpers';
 
 interface InstanceDetailProps {
   label: string;
@@ -52,6 +52,10 @@ export function InstanceCard(props: InstanceCardProps) {
           </ActionIcon>
         </Flex>
         <Flex justify="space-between" align="center" direction="row" wrap="wrap">
+          <InstanceDetail
+            label="NETWORK"
+            value={<Image width={25} height={25} src={getChainIconSrc(2020)} />}
+          />
           <InstanceDetail
             label="ACTIVE"
             value={
