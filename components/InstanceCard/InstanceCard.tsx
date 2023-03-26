@@ -36,15 +36,7 @@ export function InstanceCard(props: InstanceCardProps) {
   const [isCollapseOpened, { toggle: toggleCollapseOpened }] = useDisclosure(false);
 
   return (
-    <Card
-      className={classes.instanceCard}
-      shadow="sm"
-      padding="lg"
-      radius="md"
-      maw={500}
-      withBorder
-      m="xs"
-    >
+    <Card className={classes.instanceCard} shadow="sm" padding="lg" radius="md" withBorder m="xs">
       <Stack spacing="xl">
         <Flex justify="space-between" align="center" direction="row" wrap="wrap">
           <PairIcon
