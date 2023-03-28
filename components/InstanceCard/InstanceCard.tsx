@@ -12,7 +12,7 @@ interface InstanceDetailProps {
   value: string | any;
 }
 
-function InstanceDetail(props: InstanceDetailProps) {
+export function InstanceDetail(props: InstanceDetailProps) {
   const { label, value } = props;
 
   return (
