@@ -1,4 +1,4 @@
-import { AppShell, Header, Flex, SimpleGrid } from '@mantine/core';
+import { AppShell, Header, Flex, SimpleGrid, Grid } from '@mantine/core';
 import { useState } from 'react';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { InstanceController } from '../components/InstanceController/InstanceController';
@@ -133,24 +133,21 @@ export default function HomePage() {
         </Header>
       }
     >
-      <SimpleGrid
-        cols={2}
-        h="100%"
-        breakpoints={[
-          { maxWidth: '48rem', cols: 2, spacing: 'sm' },
-          { maxWidth: '36rem', cols: 1, spacing: 'sm' },
-        ]}
-      >
-        <InstancesContainer
-          instances={instances}
-          onSelect={handleInstanceSelect}
-          selectedInstance={selectedInstance}
-        />
-        <InstanceController
-          selectedInstance={selectedInstance}
-          setSelectedInstance={setSelectedInstance}
-        />
-      </SimpleGrid>
+      <Grid h="100%">
+        <Grid.Col h="100%" span={5}>
+          <InstancesContainer
+            instances={instances}
+            onSelect={handleInstanceSelect}
+            selectedInstance={selectedInstance}
+          />
+        </Grid.Col>
+        <Grid.Col h="100%" span={7}>
+          <InstanceController
+            selectedInstance={selectedInstance}
+            setSelectedInstance={setSelectedInstance}
+          />
+        </Grid.Col>
+      </Grid>
     </AppShell>
   );
 }

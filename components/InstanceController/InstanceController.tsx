@@ -12,7 +12,7 @@ export function InstanceController(props: InstanceControllerProps) {
   const { selectedInstance, setSelectedInstance } = props;
 
   return (
-    <Card shadow="sm" radius="md" withBorder sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Card h="100%" shadow="sm" radius="md" withBorder sx={{ display: 'flex', justifyContent: 'center' }}>
       {selectedInstance ? (
         <InstanceInformation
           selectedInstance={selectedInstance}
