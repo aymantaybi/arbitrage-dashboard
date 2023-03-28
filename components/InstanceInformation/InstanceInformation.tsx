@@ -1,5 +1,12 @@
-import { Grid, Flex, Image, Tabs, Table, Stack, Text } from '@mantine/core';
-import { IconCircleFilled, IconExchange, IconFileInvoice, IconWallet } from '@tabler/icons-react';
+import { Flex, Image, Tabs, Table, Select, ActionIcon } from '@mantine/core';
+import {
+  IconCircleFilled,
+  IconExchange,
+  IconFileInvoice,
+  IconX,
+  IconWallet,
+} from '@tabler/icons-react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { getChainIconSrc, getTokenIconSrc } from '../../helpers';
 import { LightInstance, MarginOpenOrder } from '../../interfaces';
 import { InstanceDetail } from '../InstanceCard/InstanceCard';
@@ -8,41 +15,53 @@ import { TokenIconContainer } from '../TokenIconContainer/TokenIconContainer';
 import useStyles from './InstanceInformation.styles';
 
 interface InstanceInformationHeaderProps {
-  data: LightInstance;
+  selectedInstance: LightInstance;
+  setSelectedInstance: Dispatch<SetStateAction<LightInstance | undefined>>;
 }
 
 function InstanceInformationHeader(props: InstanceInformationHeaderProps) {
   const { classes } = useStyles();
 
-  const { data } = props;
+  const { selectedInstance, setSelectedInstance } = props;
 
   return (
-    <Grid p="xl" columns={12}>
-      <Grid.Col className={classes.headerGridCol} span={6}>
-        <PairIcon
-          base={getTokenIconSrc(data.market.baseToken.symbol)}
-          quote={getTokenIconSrc(data.market.quoteToken.symbol)}
-        />
-      </Grid.Col>
-      <Grid.Col className={classes.headerGridCol} span={3}>
-        <InstanceDetail
-          label="NETWORK"
-          value={<Image width={25} height={25} src={getChainIconSrc(2020)} />}
-        />
-      </Grid.Col>
-      <Grid.Col className={classes.headerGridCol} span={3}>
-        <InstanceDetail
-          label="ACTIVE"
-          value={
-            <IconCircleFilled
-              size={18}
-              opacity={0.75}
-              style={{ color: data.status.active ? 'green' : 'red' }}
-            />
-          }
-        />
-      </Grid.Col>
-    </Grid>
+    <Flex
+      p="md"
+      w="100%"
+      justify="space-between"
+      align="center"
+      direction="row"
+      wrap="wrap"
+      gap="xl"
+    >
+      <ActionIcon
+        size="lg"
+        variant="light"
+        onClick={() => {
+          setSelectedInstance(undefined);
+        }}
+      >
+        <IconX size="1.5rem" />
+      </ActionIcon>
+      <PairIcon
+        base={getTokenIconSrc(selectedInstance.market.baseToken.symbol)}
+        quote={getTokenIconSrc(selectedInstance.market.quoteToken.symbol)}
+      />
+      <InstanceDetail
+        label="NETWORK"
+        value={<Image width={25} height={25} src={getChainIconSrc(2020)} />}
+      />
+      <InstanceDetail
+        label="ACTIVE"
+        value={
+          <IconCircleFilled
+            size={18}
+            opacity={0.75}
+            style={{ color: selectedInstance.status.active ? 'green' : 'red' }}
+          />
+        }
+      />
+    </Flex>
   );
 }
 
@@ -55,8 +74,8 @@ function InstanceMarginBalances(props: InstanceMarginBalancesProps) {
   const rows = balances.map((balance) => (
     <tr key={balance.asset}>
       <td>
-        <TokenIconContainer size={43}>
-          <Image width={36} height={36} src={getTokenIconSrc(balance.asset)} />
+        <TokenIconContainer size={30}>
+          <Image width={24} height={24} src={getTokenIconSrc(balance.asset)} />
         </TokenIconContainer>
       </td>
       <td>{balance.asset}</td>
@@ -89,8 +108,8 @@ function InstanceOnChainBalances(props: InstanceOnChainBalancesProps) {
   const rows = tokens.map((token) => (
     <tr key={token.address}>
       <td>
-        <TokenIconContainer size={43}>
-          <Image width={36} height={36} src={getTokenIconSrc(token.symbol)} />
+        <TokenIconContainer size={30}>
+          <Image width={24} height={24} src={getTokenIconSrc(token.symbol)} />
         </TokenIconContainer>
       </td>
       <td>{token.symbol}</td>
@@ -120,20 +139,34 @@ interface InstanceBalancesProps {
 function InstanceBalances(props: InstanceBalancesProps) {
   const { data } = props;
 
+  const [balanceType, setBalanceType] = useState<string | null>('Margin');
+
   return (
-    <Stack spacing="xs">
-      <Text size={20} weight={700} bg="grey" align="center">
-        Margin
-      </Text>
-      <InstanceMarginBalances balances={data.status.marginBalances} />
-      <Text size={20} weight={700} bg="grey" align="center">
-        On Chain
-      </Text>
-      <InstanceOnChainBalances
-        tokens={data.status.onChainBalances.tokens}
-        account={data.status.onChainBalances.account}
+    <Flex
+      p="md"
+      w="100%"
+      justify="flex-start"
+      align="stretch"
+      direction="column"
+      wrap="wrap"
+      gap="xl"
+    >
+      <Select
+        sx={{ alignSelf: 'flex-end' }}
+        value={balanceType}
+        onChange={setBalanceType}
+        data={['Margin', 'On Chain']}
+        size="xs"
       />
-    </Stack>
+      {balanceType === 'Margin' ? (
+        <InstanceMarginBalances balances={data.status.marginBalances} />
+      ) : (
+        <InstanceOnChainBalances
+          tokens={data.status.onChainBalances.tokens}
+          account={data.status.onChainBalances.account}
+        />
+      )}
+    </Flex>
   );
 }
 
@@ -158,7 +191,7 @@ function InstanceMarginOpenOrders(props: InstanceMarginOpenOrdersProps) {
         </td>
         <td>{symbol}</td>
         <td>{type}</td>
-        <td>{side}</td>
+        <td color={side === 'BUY' ? 'green' : 'red'}>{side}</td>
         <td>{price}</td>
         <td>{origQty}</td>
         <td>{executedQty}</td>
@@ -185,17 +218,19 @@ function InstanceMarginOpenOrders(props: InstanceMarginOpenOrdersProps) {
 }
 
 interface InstanceInformationProps {
-  data: LightInstance;
+  selectedInstance: LightInstance;
+  setSelectedInstance: Dispatch<SetStateAction<LightInstance | undefined>>;
 }
 
 export function InstanceInformation(props: InstanceInformationProps) {
-  const { classes } = useStyles();
-
-  const { data } = props;
+  const { selectedInstance, setSelectedInstance } = props;
 
   return (
-    <Flex justify="flex-start" align="stretch" direction="column" wrap="wrap" gap="xl">
-      <InstanceInformationHeader data={data} />
+    <Flex w="100%" justify="flex-start" align="stretch" direction="column" wrap="wrap" gap="xl">
+      <InstanceInformationHeader
+        selectedInstance={selectedInstance}
+        setSelectedInstance={setSelectedInstance}
+      />
       <Tabs defaultValue="balances">
         <Tabs.List grow>
           <Tabs.Tab value="balances" icon={<IconWallet size="0.8rem" />}>
@@ -209,10 +244,10 @@ export function InstanceInformation(props: InstanceInformationProps) {
           </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="balances" pt="xs">
-          <InstanceBalances data={data} />
+          <InstanceBalances data={selectedInstance} />
         </Tabs.Panel>
         <Tabs.Panel value="orders" pt="xs">
-          <InstanceMarginOpenOrders marginOpenOrders={data.status.marginOpenOrders} />
+          <InstanceMarginOpenOrders marginOpenOrders={selectedInstance.status.marginOpenOrders} />
         </Tabs.Panel>
         <Tabs.Panel value="trades" pt="xs">
           Trades Tab

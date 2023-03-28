@@ -27,16 +27,26 @@ export function InstanceDetail(props: InstanceDetailProps) {
 
 interface InstanceCardProps {
   data: LightInstance;
+  onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
+  isSelected: boolean;
 }
 
 export function InstanceCard(props: InstanceCardProps) {
   const { classes } = useStyles();
-  const { data } = props;
+  const { data, onClick, isSelected } = props;
 
   const [isCollapseOpened, { toggle: toggleCollapseOpened }] = useDisclosure(false);
 
   return (
-    <Card className={classes.instanceCard} shadow="sm" padding="lg" radius="md" withBorder m="xs">
+    <Card
+      className={classes.instanceCard}
+      shadow="sm"
+      padding="lg"
+      radius="md"
+      withBorder
+      m="xs"
+      onClick={onClick}
+    >
       <Stack spacing="xl">
         <Flex justify="space-between" align="center" direction="row" wrap="wrap">
           <PairIcon

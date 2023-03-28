@@ -1,4 +1,5 @@
 import { AppShell, Header, Flex, SimpleGrid } from '@mantine/core';
+import { useState } from 'react';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { InstanceController } from '../components/InstanceController/InstanceController';
 import { InstancesContainer } from '../components/InstancesContainer/InstancesContainer';
@@ -113,18 +114,13 @@ const instance = {
 };
 
 export default function HomePage() {
-  const instances: LightInstance[] = [
-    instance,
-    {
-      ...instance,
-      status: { ...instance.status, active: false },
-      market: {
-        ...instance.market,
-        baseToken: { symbol: 'SLP', address: '' },
-        quoteToken: { symbol: 'WETH', address: '' },
-      },
-    },
-  ];
+  const [selectedInstance, setSelectedInstance] = useState<LightInstance | undefined>(undefined);
+
+  const instances: LightInstance[] = [instance];
+
+  const handleInstanceSelect = (item: LightInstance) => {
+    setSelectedInstance(item);
+  };
 
   return (
     <AppShell
@@ -145,8 +141,15 @@ export default function HomePage() {
           { maxWidth: '36rem', cols: 1, spacing: 'sm' },
         ]}
       >
-        <InstancesContainer instances={instances} />
-        <InstanceController />
+        <InstancesContainer
+          instances={instances}
+          onSelect={handleInstanceSelect}
+          selectedInstance={selectedInstance}
+        />
+        <InstanceController
+          selectedInstance={selectedInstance}
+          setSelectedInstance={setSelectedInstance}
+        />
       </SimpleGrid>
     </AppShell>
   );
