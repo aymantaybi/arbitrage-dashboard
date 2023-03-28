@@ -6,6 +6,8 @@ module.exports = {
       name: 'storybook-addon-turbo-build',
       options: { optimizationLevel: 2 },
     },
+    '@storybook/addon-essentials',
   ],
   framework: '@storybook/react',
+  staticDirs: ['../public'],
 };
