@@ -1,8 +1,4 @@
-import {
-  ApolloCache,
-  DefaultContext,
-  MutationFunctionOptions,
-} from '@apollo/client';
+import { ApolloCache, DefaultContext, MutationFunctionOptions } from '@apollo/client';
 import { ActionIcon, Button, Card, Collapse, Flex, Image, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconCaretDown, IconCaretUp, IconCircleFilled } from '@tabler/icons-react';
@@ -48,11 +44,25 @@ interface InstanceCardProps {
         >
       | undefined
   ) => Promise<any>;
+  stopInstance: (
+    options?:
+      | MutationFunctionOptions<
+          {
+            stopInstance: LightInstance;
+          },
+          {
+            id: string;
+          },
+          DefaultContext,
+          ApolloCache<any>
+        >
+      | undefined
+  ) => Promise<any>;
 }
 
 export function InstanceCard(props: InstanceCardProps) {
   const { classes } = useStyles();
-  const { data, onClick, isSelected, startInstance } = props;
+  const { data, onClick, isSelected, startInstance, stopInstance } = props;
 
   const [isCollapseOpened, { toggle: toggleCollapseOpened }] = useDisclosure(false);
 
@@ -104,7 +114,14 @@ export function InstanceCard(props: InstanceCardProps) {
               <Button fullWidth variant="light">
                 Restart
               </Button>
-              <Button fullWidth variant="light" color="red">
+              <Button
+                fullWidth
+                variant="light"
+                color="red"
+                onClick={() => {
+                  stopInstance({ variables: { id: data.id } });
+                }}
+              >
                 Stop
               </Button>
             </Flex>

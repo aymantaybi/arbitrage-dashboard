@@ -22,10 +22,24 @@ interface InstancesContainerProps {
         >
       | undefined
   ) => Promise<any>;
+  stopInstance: (
+    options?:
+      | MutationFunctionOptions<
+          {
+            stopInstance: LightInstance;
+          },
+          {
+            id: string;
+          },
+          DefaultContext,
+          ApolloCache<any>
+        >
+      | undefined
+  ) => Promise<any>;
 }
 
 export function InstancesContainer(props: InstancesContainerProps) {
-  const { instances, onSelect, selectedInstance, startInstance } = props;
+  const { instances, onSelect, selectedInstance, startInstance, stopInstance } = props;
 
   const isInstanceSelected = (instance: LightInstance) =>
     selectedInstance !== undefined && instance.id === selectedInstance.id;
@@ -44,6 +58,7 @@ export function InstancesContainer(props: InstancesContainerProps) {
             }}
             isSelected={isInstanceSelected(instance)}
             startInstance={startInstance}
+            stopInstance={stopInstance}
           />
         ))}
       </ScrollArea>

@@ -5,7 +5,7 @@ import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeTo
 import { InstanceController } from '../components/InstanceController/InstanceController';
 import { InstancesContainer } from '../components/InstancesContainer/InstancesContainer';
 import { LightInstance } from '../interfaces';
-import { GET_INSTANCES, START_INSTANCE } from '../constants';
+import { GET_INSTANCES, START_INSTANCE, STOP_INSTANCE } from '../constants';
 
 export default function HomePage() {
   const [instances, setInstances] = useState<LightInstance[]>([]);
@@ -24,6 +24,19 @@ export default function HomePage() {
         setInstances((current) =>
           current.map((instance) =>
             instance.id === data.startInstance.id ? data.startInstance : instance
+          )
+        );
+      },
+    }
+  );
+
+  const [stopInstance] = useMutation<{ stopInstance: LightInstance }, { id: string }>(
+    STOP_INSTANCE,
+    {
+      onCompleted(data) {
+        setInstances((current) =>
+          current.map((instance) =>
+            instance.id === data.stopInstance.id ? data.stopInstance : instance
           )
         );
       },
@@ -52,6 +65,7 @@ export default function HomePage() {
             onSelect={handleInstanceSelect}
             selectedInstance={selectedInstance}
             startInstance={startInstance}
+            stopInstance={stopInstance}
           />
         </Grid.Col>
         <Grid.Col h="100%" span={7}>
