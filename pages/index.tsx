@@ -1,4 +1,4 @@
-import { AppShell, Header, Flex, SimpleGrid, Grid } from '@mantine/core';
+import { AppShell, Header, Flex, Grid } from '@mantine/core';
 import { useState } from 'react';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { InstanceController } from '../components/InstanceController/InstanceController';

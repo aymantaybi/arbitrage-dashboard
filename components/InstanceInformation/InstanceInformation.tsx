@@ -12,7 +12,6 @@ import { LightInstance, MarginOpenOrder } from '../../interfaces';
 import { InstanceDetail } from '../InstanceCard/InstanceCard';
 import PairIcon from '../PairIcon/PairIcon';
 import { TokenIconContainer } from '../TokenIconContainer/TokenIconContainer';
-import useStyles from './InstanceInformation.styles';
 
 interface InstanceInformationHeaderProps {
   selectedInstance: LightInstance;
@@ -20,8 +19,6 @@ interface InstanceInformationHeaderProps {
 }
 
 function InstanceInformationHeader(props: InstanceInformationHeaderProps) {
-  const { classes } = useStyles();
-
   const { selectedInstance, setSelectedInstance } = props;
 
   return (
@@ -104,7 +101,8 @@ interface InstanceOnChainBalancesProps {
 }
 
 function InstanceOnChainBalances(props: InstanceOnChainBalancesProps) {
-  const { tokens } = props;
+  const { account, tokens } = props;
+  console.log(account);
   const rows = tokens.map((token) => (
     <tr key={token.address}>
       <td>
@@ -193,8 +191,8 @@ function InstanceMarginOpenOrders(props: InstanceMarginOpenOrdersProps) {
         <td>{type}</td>
         <td color={side === 'BUY' ? 'green' : 'red'}>{side}</td>
         <td>{price}</td>
-        <td>{origQty}</td>
-        <td>{executedQty}</td>
+        <td>{Number(origQty)}</td>
+        <td>{Number(executedQty)}</td>
       </tr>
     )
   );

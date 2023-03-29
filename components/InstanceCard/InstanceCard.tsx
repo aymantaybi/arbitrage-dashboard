@@ -39,7 +39,7 @@ export function InstanceCard(props: InstanceCardProps) {
 
   return (
     <Card
-      className={classes.instanceCard}
+      className={isSelected ? classes.selectedInstanceCard : classes.instanceCard}
       shadow="sm"
       padding="lg"
       radius="md"
