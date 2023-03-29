@@ -1,11 +1,16 @@
-import { ActionIcon, Card, Flex, Stack, Text, Button, Collapse, Image } from '@mantine/core';
-import React from 'react';
-import { IconCaretDown, IconCircleFilled, IconCaretUp } from '@tabler/icons-react';
+import {
+  ApolloCache,
+  DefaultContext,
+  MutationFunctionOptions,
+} from '@apollo/client';
+import { ActionIcon, Button, Card, Collapse, Flex, Image, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { IconCaretDown, IconCaretUp, IconCircleFilled } from '@tabler/icons-react';
+import React from 'react';
+import { getChainIconSrc, getTokenIconSrc } from '../../helpers';
+import { LightInstance } from '../../interfaces';
 import PairIcon from '../PairIcon/PairIcon';
 import useStyles from './InstanceCard.styles';
-import { LightInstance } from '../../interfaces';
-import { getChainIconSrc, getTokenIconSrc } from '../../helpers';
 
 interface InstanceDetailProps {
   label: string;
@@ -29,11 +34,25 @@ interface InstanceCardProps {
   data: LightInstance;
   onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
   isSelected: boolean;
+  startInstance: (
+    options?:
+      | MutationFunctionOptions<
+          {
+            startInstance: LightInstance;
+          },
+          {
+            id: string;
+          },
+          DefaultContext,
+          ApolloCache<any>
+        >
+      | undefined
+  ) => Promise<any>;
 }
 
 export function InstanceCard(props: InstanceCardProps) {
   const { classes } = useStyles();
-  const { data, onClick, isSelected } = props;
+  const { data, onClick, isSelected, startInstance } = props;
 
   const [isCollapseOpened, { toggle: toggleCollapseOpened }] = useDisclosure(false);
 
@@ -90,7 +109,14 @@ export function InstanceCard(props: InstanceCardProps) {
               </Button>
             </Flex>
           ) : (
-            <Button fullWidth variant="light" color="green">
+            <Button
+              fullWidth
+              variant="light"
+              color="green"
+              onClick={() => {
+                startInstance({ variables: { id: data.id } });
+              }}
+            >
               Start
             </Button>
           )}

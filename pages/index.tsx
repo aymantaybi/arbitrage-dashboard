@@ -1,21 +1,34 @@
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { AppShell, Header, Flex, Grid } from '@mantine/core';
 import { useState } from 'react';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { InstanceController } from '../components/InstanceController/InstanceController';
 import { InstancesContainer } from '../components/InstancesContainer/InstancesContainer';
 import { LightInstance } from '../interfaces';
-import { GET_INSTANCES } from '../constants';
+import { GET_INSTANCES, START_INSTANCE } from '../constants';
 
 export default function HomePage() {
-  const [instances, setInstance] = useState<LightInstance[]>([]);
+  const [instances, setInstances] = useState<LightInstance[]>([]);
   const [selectedInstance, setSelectedInstance] = useState<LightInstance | undefined>(undefined);
 
   useQuery<{ instances: LightInstance[] }>(GET_INSTANCES, {
     onCompleted(data) {
-      setInstance(data.instances);
+      setInstances(data.instances);
     },
   });
+
+  const [startInstance] = useMutation<{ startInstance: LightInstance }, { id: string }>(
+    START_INSTANCE,
+    {
+      onCompleted(data) {
+        setInstances((current) =>
+          current.map((instance) =>
+            instance.id === data.startInstance.id ? data.startInstance : instance
+          )
+        );
+      },
+    }
+  );
 
   const handleInstanceSelect = (item: LightInstance) => {
     setSelectedInstance(item);
@@ -38,6 +51,7 @@ export default function HomePage() {
             instances={instances}
             onSelect={handleInstanceSelect}
             selectedInstance={selectedInstance}
+            startInstance={startInstance}
           />
         </Grid.Col>
         <Grid.Col h="100%" span={7}>

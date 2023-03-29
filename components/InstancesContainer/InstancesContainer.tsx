@@ -1,3 +1,4 @@
+import { ApolloCache, DefaultContext, MutationFunctionOptions } from '@apollo/client';
 import { Stack, Text, ScrollArea } from '@mantine/core';
 import React from 'react';
 import { LightInstance } from '../../interfaces';
@@ -7,10 +8,24 @@ interface InstancesContainerProps {
   instances: LightInstance[];
   onSelect: (instance: LightInstance) => void;
   selectedInstance: LightInstance | undefined;
+  startInstance: (
+    options?:
+      | MutationFunctionOptions<
+          {
+            startInstance: LightInstance;
+          },
+          {
+            id: string;
+          },
+          DefaultContext,
+          ApolloCache<any>
+        >
+      | undefined
+  ) => Promise<any>;
 }
 
 export function InstancesContainer(props: InstancesContainerProps) {
-  const { instances, onSelect, selectedInstance } = props;
+  const { instances, onSelect, selectedInstance, startInstance } = props;
 
   const isInstanceSelected = (instance: LightInstance) =>
     selectedInstance !== undefined && instance.id === selectedInstance.id;
@@ -28,6 +43,7 @@ export function InstancesContainer(props: InstancesContainerProps) {
               onSelect(instance);
             }}
             isSelected={isInstanceSelected(instance)}
+            startInstance={startInstance}
           />
         ))}
       </ScrollArea>
