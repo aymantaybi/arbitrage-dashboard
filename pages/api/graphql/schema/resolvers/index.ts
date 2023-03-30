@@ -1,18 +1,31 @@
-import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import { YogaLink } from '@graphql-yoga/apollo-link';
 import fetch from 'cross-fetch';
 import { GraphQLError } from 'graphql';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
-import { GET_INSTANCES, START_INSTANCE, STOP_INSTANCE } from '../../../../../constants';
+import { createPubSub } from 'graphql-yoga';
+import {
+  GET_INSTANCES,
+  INSTANCE_UPDATE,
+  START_INSTANCE,
+  STOP_INSTANCE,
+} from '../../../../../constants';
 import { LightInstance } from '../../../../../interfaces';
 import { getDomainEnvVariables } from '../../../../../utils';
 
+export const pubSub = createPubSub();
+
 const chainIdToClientMap: { [chainId: number]: ApolloClient<NormalizedCacheObject> } = {};
 
-getDomainEnvVariables('ARBITRAGE_MANAGER_').forEach(([key, uri]) => {
+const subscriptions = [];
+
+getDomainEnvVariables('ARBITRAGE_MANAGER_').forEach(([key, endpoint]) => {
   const chainId = Number(key.slice('ARBITRAGE_MANAGER_'.length));
-  const httpLink = new HttpLink({ uri, fetch });
   chainIdToClientMap[chainId] = new ApolloClient({
-    link: httpLink,
+    link: new YogaLink({
+      endpoint,
+      fetch,
+    }),
     cache: new InMemoryCache(),
   });
 });
@@ -64,6 +77,25 @@ export const resolvers = {
         variables,
       });
       return data?.stopInstance;
+    },
+  },
+  Subscription: {
+    instanceUpdate: {
+      subscribe: (_: unknown, args: { chainId: number }) => {
+        const { chainId } = args;
+        const client = chainIdToClientMap[chainId];
+        if (!client) return new GraphQLError(`chainId ${chainId} is not supported.`);
+        const query = INSTANCE_UPDATE;
+        const variables = { chainId };
+        const observer = client.subscribe<{ instanceUpdate: LightInstance }>({ query, variables });
+        const subscription = observer.subscribe(({ data }) => {
+          if (!data) return;
+          pubSub.publish('instanceUpdate', data.instanceUpdate);
+        });
+        subscriptions.push(subscription);
+        return pubSub.subscribe('instanceUpdate');
+      },
+      resolve: (payload: unknown) => payload,
     },
   },
 };

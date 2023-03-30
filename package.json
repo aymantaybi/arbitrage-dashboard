@@ -22,6 +22,7 @@
     "@apollo/client": "^3.7.10",
     "@emotion/react": "^11.10.4",
     "@emotion/server": "^11.10.0",
+    "@graphql-yoga/apollo-link": "^1.7.0",
     "@mantine/carousel": "6.0.2",
     "@mantine/core": "6.0.2",
     "@mantine/dates": "6.0.2",

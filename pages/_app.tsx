@@ -5,11 +5,12 @@ import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-
-const { ARBITRAGE_MANAGER_URI } = process.env;
+import { YogaLink } from '@graphql-yoga/apollo-link';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:5500/graphql',
+  link: new YogaLink({
+    endpoint: 'http://localhost:3000/api/graphql',
+  }),
   cache: new InMemoryCache(),
 });
 

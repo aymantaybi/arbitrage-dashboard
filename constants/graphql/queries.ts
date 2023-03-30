@@ -179,3 +179,63 @@ export const STOP_INSTANCE = gql`
     }
   }
 `;
+
+export const INSTANCE_UPDATE = gql`
+  subscription InstanceUpdate($chainId: Int) {
+    instanceUpdate(chainId: $chainId) {
+      chainId
+      id
+      market {
+        baseToken {
+          address
+          symbol
+        }
+        paths {
+          pairs
+          router
+          tokens
+        }
+        quoteToken {
+          address
+          symbol
+        }
+        symbol
+      }
+      status {
+        active
+        marginBalances {
+          asset
+          free
+          locked
+        }
+        marginOpenOrders {
+          clientOrderId
+          cummulativeQuoteQty
+          executedQty
+          icebergQty
+          isIsolated
+          isWorking
+          orderId
+          origQty
+          price
+          side
+          status
+          stopPrice
+          symbol
+          time
+          timeInForce
+          type
+          updateTime
+        }
+        onChainBalances {
+          account
+          tokens {
+            address
+            balance
+            symbol
+          }
+        }
+      }
+    }
+  }
+`;

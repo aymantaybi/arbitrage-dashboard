@@ -1,17 +1,20 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { AppShell, Header, Flex, Grid } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { InstanceController } from '../components/InstanceController/InstanceController';
 import { InstancesContainer } from '../components/InstancesContainer/InstancesContainer';
 import { LightInstance } from '../interfaces';
-import { GET_INSTANCES, START_INSTANCE, STOP_INSTANCE } from '../constants';
+import { GET_INSTANCES, INSTANCE_UPDATE, START_INSTANCE, STOP_INSTANCE } from '../constants';
+
+const chainId = 2020;
 
 export default function HomePage() {
   const [instances, setInstances] = useState<LightInstance[]>([]);
   const [selectedInstance, setSelectedInstance] = useState<LightInstance | undefined>(undefined);
 
   useQuery<{ instances: LightInstance[] }>(GET_INSTANCES, {
+    variables: { chainId },
     onCompleted(data) {
       setInstances(data.instances);
     },
@@ -20,25 +23,23 @@ export default function HomePage() {
   const [startInstance] = useMutation<
     { startInstance: LightInstance },
     { chainId: number; id: string }
-  >(START_INSTANCE, {
-    onCompleted(data) {
-      setInstances((current) =>
-        current.map((instance) =>
-          instance.id === data.startInstance.id ? data.startInstance : instance
-        )
-      );
-    },
-  });
+  >(START_INSTANCE);
 
   const [stopInstance] = useMutation<
     { stopInstance: LightInstance },
     { chainId: number; id: string }
-  >(STOP_INSTANCE, {
-    onCompleted(data) {
+  >(STOP_INSTANCE);
+
+  useSubscription<{ instanceUpdate: LightInstance }>(INSTANCE_UPDATE, {
+    variables: { chainId },
+    onData({ data }) {
+      const instanceUpdate = data.data?.instanceUpdate;
+      if (!instanceUpdate) return;
       setInstances((current) =>
-        current.map((instance) =>
-          instance.id === data.stopInstance.id ? data.stopInstance : instance
-        )
+        current.map((instance) => (instance.id === instanceUpdate.id ? instanceUpdate : instance))
+      );
+      setSelectedInstance((current) =>
+        current?.id === instanceUpdate.id ? instanceUpdate : current
       );
     },
   });
@@ -46,11 +47,6 @@ export default function HomePage() {
   const handleInstanceSelect = (item: LightInstance) => {
     setSelectedInstance(item);
   };
-
-  useEffect(() => {
-    const instance = instances.find((item) => item.id === selectedInstance?.id);
-    setSelectedInstance(instance);
-  }, [instances]);
 
   return (
     <AppShell

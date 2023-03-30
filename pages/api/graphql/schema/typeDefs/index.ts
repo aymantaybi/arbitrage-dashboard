@@ -108,4 +108,9 @@ type Mutation {
   ): Boolean
   startInstance(id: String, chainId: Int): Instance
   stopInstance(id: String, chainId: Int): Instance
-}`;
+}
+
+type Subscription {
+  instanceUpdate(chainId: Int): Instance
+}
+`;
