@@ -15,6 +15,7 @@ interface InstancesContainerProps {
             startInstance: LightInstance;
           },
           {
+            chainId: number;
             id: string;
           },
           DefaultContext,
@@ -29,6 +30,7 @@ interface InstancesContainerProps {
             stopInstance: LightInstance;
           },
           {
+            chainId: number;
             id: string;
           },
           DefaultContext,

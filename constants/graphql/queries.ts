@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_INSTANCES = gql`
-  query GetInstances {
-    instances {
+  query GetInstances($chainId: Int) {
+    instances(chainId: $chainId) {
       id
       chainId
       market {
@@ -61,8 +61,8 @@ export const GET_INSTANCES = gql`
 `;
 
 export const START_INSTANCE = gql`
-  mutation StartInstance($id: String) {
-    startInstance(id: $id) {
+  mutation StartInstance($chainId: Int, $id: String) {
+    startInstance(chainId: $chainId, id: $id) {
       id
       chainId
       market {
@@ -121,8 +121,8 @@ export const START_INSTANCE = gql`
 `;
 
 export const STOP_INSTANCE = gql`
-  mutation StopInstance($id: String) {
-    stopInstance(id: $id) {
+  mutation StopInstance($chainId: Int, $id: String) {
+    stopInstance(chainId: $chainId, id: $id) {
       id
       chainId
       market {

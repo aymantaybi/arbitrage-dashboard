@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { AppShell, Header, Flex, Grid } from '@mantine/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { InstanceController } from '../components/InstanceController/InstanceController';
 import { InstancesContainer } from '../components/InstancesContainer/InstancesContainer';
@@ -17,35 +17,40 @@ export default function HomePage() {
     },
   });
 
-  const [startInstance] = useMutation<{ startInstance: LightInstance }, { id: string }>(
-    START_INSTANCE,
-    {
-      onCompleted(data) {
-        setInstances((current) =>
-          current.map((instance) =>
-            instance.id === data.startInstance.id ? data.startInstance : instance
-          )
-        );
-      },
-    }
-  );
+  const [startInstance] = useMutation<
+    { startInstance: LightInstance },
+    { chainId: number; id: string }
+  >(START_INSTANCE, {
+    onCompleted(data) {
+      setInstances((current) =>
+        current.map((instance) =>
+          instance.id === data.startInstance.id ? data.startInstance : instance
+        )
+      );
+    },
+  });
 
-  const [stopInstance] = useMutation<{ stopInstance: LightInstance }, { id: string }>(
-    STOP_INSTANCE,
-    {
-      onCompleted(data) {
-        setInstances((current) =>
-          current.map((instance) =>
-            instance.id === data.stopInstance.id ? data.stopInstance : instance
-          )
-        );
-      },
-    }
-  );
+  const [stopInstance] = useMutation<
+    { stopInstance: LightInstance },
+    { chainId: number; id: string }
+  >(STOP_INSTANCE, {
+    onCompleted(data) {
+      setInstances((current) =>
+        current.map((instance) =>
+          instance.id === data.stopInstance.id ? data.stopInstance : instance
+        )
+      );
+    },
+  });
 
   const handleInstanceSelect = (item: LightInstance) => {
     setSelectedInstance(item);
   };
+
+  useEffect(() => {
+    const instance = instances.find((item) => item.id === selectedInstance?.id);
+    setSelectedInstance(instance);
+  }, [instances]);
 
   return (
     <AppShell

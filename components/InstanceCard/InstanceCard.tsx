@@ -37,6 +37,7 @@ interface InstanceCardProps {
             startInstance: LightInstance;
           },
           {
+            chainId: number;
             id: string;
           },
           DefaultContext,
@@ -51,6 +52,7 @@ interface InstanceCardProps {
             stopInstance: LightInstance;
           },
           {
+            chainId: number;
             id: string;
           },
           DefaultContext,
@@ -119,7 +121,7 @@ export function InstanceCard(props: InstanceCardProps) {
                 variant="light"
                 color="red"
                 onClick={() => {
-                  stopInstance({ variables: { id: data.id } });
+                  stopInstance({ variables: { id: data.id, chainId: data.chainId } });
                 }}
               >
                 Stop
@@ -131,7 +133,7 @@ export function InstanceCard(props: InstanceCardProps) {
               variant="light"
               color="green"
               onClick={() => {
-                startInstance({ variables: { id: data.id } });
+                startInstance({ variables: { id: data.id, chainId: data.chainId } });
               }}
             >
               Start
