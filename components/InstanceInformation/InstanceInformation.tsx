@@ -235,7 +235,7 @@ export function InstanceInformation(props: InstanceInformationProps) {
             Balances
           </Tabs.Tab>
           <Tabs.Tab value="orders" icon={<IconFileInvoice size="0.8rem" />}>
-            Open Orders
+            {`Open Orders (${selectedInstance.status.marginOpenOrders.length})`}
           </Tabs.Tab>
           <Tabs.Tab value="trades" icon={<IconExchange size="0.8rem" />}>
             Trades
