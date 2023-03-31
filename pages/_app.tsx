@@ -4,13 +4,27 @@ import { getCookie, setCookie } from 'cookies-next';
 import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-import { YogaLink } from '@graphql-yoga/apollo-link';
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, split } from '@apollo/client';
+//import { YogaLink } from '@graphql-yoga/apollo-link';
+import { getOperationAST } from 'graphql';
+import { SSELink } from '../helpers';
+
+const uri = 'http://localhost:3000/api/graphql';
+
+const sseLink = new SSELink({ uri });
+const httpLink = new HttpLink({ uri });
+
+const link = split(
+  ({ query, operationName }) => {
+    const definition = getOperationAST(query, operationName);
+    return definition?.kind === 'OperationDefinition' && definition.operation === 'subscription';
+  },
+  sseLink,
+  httpLink
+);
 
 const client = new ApolloClient({
-  link: new YogaLink({
-    endpoint: 'http://localhost:3000/api/graphql',
-  }),
+  link,
   cache: new InMemoryCache(),
 });
 
