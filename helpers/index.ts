@@ -1,3 +1,5 @@
+export * from './SSELink';
+
 export function getTokenIconSrc(symbol: string) {
   if (symbol === 'SLP') return 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png';
   if (symbol === 'BUSD') return 'https://s2.coinmarketcap.com/static/img/coins/64x64/4687.png';

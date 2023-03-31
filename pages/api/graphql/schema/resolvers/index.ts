@@ -1,15 +1,23 @@
-import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
-import { YogaLink } from '@graphql-yoga/apollo-link';
+import {
+  ApolloClient,
+  HttpLink,
+  InMemoryCache,
+  NormalizedCacheObject,
+  split,
+} from '@apollo/client';
+//import { YogaLink } from '@graphql-yoga/apollo-link';
 import fetch from 'cross-fetch';
-import { GraphQLError } from 'graphql';
+import { getOperationAST, GraphQLError } from 'graphql';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import { createPubSub } from 'graphql-yoga';
+import invariant from 'tiny-invariant';
 import {
   GET_INSTANCES,
   INSTANCE_UPDATE,
   START_INSTANCE,
   STOP_INSTANCE,
 } from '../../../../../constants';
+import { SSELink } from '../../../../../helpers';
 import { LightInstance } from '../../../../../interfaces';
 import { getDomainEnvVariables } from '../../../../../utils';
 
@@ -19,13 +27,21 @@ const chainIdToClientMap: { [chainId: number]: ApolloClient<NormalizedCacheObjec
 
 const subscriptions = [];
 
-getDomainEnvVariables('ARBITRAGE_MANAGER_').forEach(([key, endpoint]) => {
+getDomainEnvVariables('ARBITRAGE_MANAGER_').forEach(([key, uri]) => {
+  invariant(uri !== undefined, `Env var ${key} cannot be undefined`);
   const chainId = Number(key.slice('ARBITRAGE_MANAGER_'.length));
+  const sseLink = new SSELink({ uri });
+  const httpLink = new HttpLink({ uri, fetch });
+  const link = split(
+    ({ query, operationName }) => {
+      const definition = getOperationAST(query, operationName);
+      return definition?.kind === 'OperationDefinition' && definition.operation === 'subscription';
+    },
+    sseLink,
+    httpLink
+  );
   chainIdToClientMap[chainId] = new ApolloClient({
-    link: new YogaLink({
-      endpoint,
-      fetch,
-    }),
+    link,
     cache: new InMemoryCache(),
   });
 });
