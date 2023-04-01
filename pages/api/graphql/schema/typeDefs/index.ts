@@ -65,11 +65,21 @@ type Status {
   marginOpenOrders: [MarginOpenOrder]
 }
 
+type Distribution {
+  minROI: Float
+  maxQuantity: Int
+}
+
+type Configuration {
+  distributions: [Distribution]
+}
+
 type Instance {
   id: String
   chainId: Int
   market: Market
   status: Status
+  configuration: Configuration
 }
 
 type Query {
@@ -100,17 +110,27 @@ input CredentialsInput {
   privateKey: String
 }
 
+input DistributionInput {
+  minROI: Float
+  maxQuantity: Int
+}
+
+input ConfigurationInput {
+  distributions: [DistributionInput]
+}
+
 type Mutation {
   createInstance(
     chainId: Int
-    credentials: CredentialsInput!
-    market: MarketInput!
-  ): Boolean
-  startInstance(id: String, chainId: Int): Instance
-  stopInstance(id: String, chainId: Int): Instance
+    credentials: CredentialsInput
+    market: MarketInput
+    configuration: ConfigurationInput
+  ): Instance
+  updateInstance(chainId: Int, id: String, configuration: ConfigurationInput): Instance
+  startInstance(chainId: Int, id: String): Instance
+  stopInstance(chainId: Int, id: String): Instance
 }
 
 type Subscription {
   instanceUpdate(chainId: Int): Instance
-}
-`;
+}`;
