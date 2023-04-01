@@ -5,12 +5,10 @@ import {
   NormalizedCacheObject,
   split,
 } from '@apollo/client';
-//import { YogaLink } from '@graphql-yoga/apollo-link';
 import fetch from 'cross-fetch';
 import { getOperationAST, GraphQLError } from 'graphql';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import { createPubSub } from 'graphql-yoga';
-import invariant from 'tiny-invariant';
 import {
   GET_INSTANCES,
   INSTANCE_UPDATE,
@@ -28,7 +26,7 @@ const chainIdToClientMap: { [chainId: number]: ApolloClient<NormalizedCacheObjec
 const subscriptions = [];
 
 getDomainEnvVariables('ARBITRAGE_MANAGER_').forEach(([key, uri]) => {
-  invariant(uri !== undefined, `Env var ${key} cannot be undefined`);
+  if (uri === undefined) throw Error(`Env var ${key} cannot be undefined`);
   const chainId = Number(key.slice('ARBITRAGE_MANAGER_'.length));
   const sseLink = new SSELink({ uri });
   const httpLink = new HttpLink({ uri, fetch });
