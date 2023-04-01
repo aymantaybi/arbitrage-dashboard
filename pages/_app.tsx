@@ -7,9 +7,18 @@ import { Notifications } from '@mantine/notifications';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, split } from '@apollo/client';
 //import { YogaLink } from '@graphql-yoga/apollo-link';
 import { getOperationAST } from 'graphql';
+import invariant from 'tiny-invariant';
 import { SSELink } from '../helpers';
 
-const uri = 'http://localhost:3000/api/graphql';
+// eslint-disable-next-line prefer-destructuring
+const NEXT_PUBLIC_GRAPHQL_API_URL = process.env.NEXT_PUBLIC_GRAPHQL_API_URL;
+
+invariant(
+  NEXT_PUBLIC_GRAPHQL_API_URL !== undefined,
+  'Missing NEXT_PUBLIC_GRAPHQL_API_URL in .env file'
+);
+
+const uri = NEXT_PUBLIC_GRAPHQL_API_URL;
 
 const sseLink = new SSELink({ uri });
 const httpLink = new HttpLink({ uri });
