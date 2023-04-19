@@ -58,6 +58,7 @@ export const GET_INSTANCES = gql`
       }
       configuration {
         distributions {
+          id
           maxQuantity
           minROI
         }
@@ -124,6 +125,7 @@ export const START_INSTANCE = gql`
       }
       configuration {
         distributions {
+          id
           maxQuantity
           minROI
         }
@@ -190,6 +192,7 @@ export const STOP_INSTANCE = gql`
       }
       configuration {
         distributions {
+          id
           maxQuantity
           minROI
         }
@@ -256,8 +259,35 @@ export const INSTANCE_UPDATE = gql`
       }
       configuration {
         distributions {
+          id
           maxQuantity
           minROI
+        }
+      }
+    }
+  }
+`;
+
+export const UPDATE_INSTANCE = gql`
+  mutation UpdateInstance(
+    $chainId: Int
+    $id: String
+    $configuration: ConfigurationInput
+  ) {
+    updateInstance(chainId: $chainId, id: $id, configuration: $configuration) {
+      chainId
+      id
+      market {
+        symbol
+      }
+      status {
+        active
+      }
+      configuration {
+        distributions {
+          id
+          minROI
+          maxQuantity
         }
       }
     }

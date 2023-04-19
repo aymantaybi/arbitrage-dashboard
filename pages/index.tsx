@@ -5,7 +5,13 @@ import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeTo
 import { InstanceController } from '../components/InstanceController/InstanceController';
 import { InstancesContainer } from '../components/InstancesContainer/InstancesContainer';
 import { LightInstance } from '../interfaces';
-import { GET_INSTANCES, INSTANCE_UPDATE, START_INSTANCE, STOP_INSTANCE } from '../constants';
+import {
+  GET_INSTANCES,
+  INSTANCE_UPDATE,
+  START_INSTANCE,
+  STOP_INSTANCE,
+  UPDATE_INSTANCE,
+} from '../constants';
 
 const chainId = 2020;
 
@@ -30,6 +36,17 @@ export default function HomePage() {
     { chainId: number; id: string }
   >(STOP_INSTANCE);
 
+  const [updateInstance] = useMutation<
+    { updateInstance: LightInstance },
+    {
+      chainId: number;
+      id: string;
+      configuration: Omit<LightInstance.Configuration, 'distributions'> & {
+        distributions: Omit<LightInstance.Configuration.Distribution, 'id'>[];
+      };
+    }
+  >(UPDATE_INSTANCE);
+
   useSubscription<{ instanceUpdate: LightInstance }>(INSTANCE_UPDATE, {
     variables: { chainId },
     onData({ data }) {
@@ -43,10 +60,6 @@ export default function HomePage() {
       );
     },
   });
-
-  const handleInstanceSelect = (item: LightInstance) => {
-    setSelectedInstance(item);
-  };
 
   return (
     <AppShell
@@ -63,7 +76,7 @@ export default function HomePage() {
         <Grid.Col h="100%" span={5}>
           <InstancesContainer
             instances={instances}
-            onSelect={handleInstanceSelect}
+            onSelect={setSelectedInstance}
             selectedInstance={selectedInstance}
             startInstance={startInstance}
             stopInstance={stopInstance}
@@ -73,6 +86,7 @@ export default function HomePage() {
           <InstanceController
             selectedInstance={selectedInstance}
             setSelectedInstance={setSelectedInstance}
+            updateInstance={updateInstance}
           />
         </Grid.Col>
       </Grid>

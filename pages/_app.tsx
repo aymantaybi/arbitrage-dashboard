@@ -4,7 +4,14 @@ import { getCookie, setCookie } from 'cookies-next';
 import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, split } from '@apollo/client';
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  HttpLink,
+  split,
+  DefaultOptions,
+} from '@apollo/client';
 import { getOperationAST } from 'graphql';
 import { SSELink } from '../helpers';
 
@@ -29,9 +36,21 @@ const link = split(
   httpLink
 );
 
+const defaultOptions: DefaultOptions = {
+  watchQuery: {
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'ignore',
+  },
+  query: {
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'all',
+  },
+};
+
 const client = new ApolloClient({
   link,
-  cache: new InMemoryCache(),
+  defaultOptions,
+  cache: new InMemoryCache({ addTypename: false }),
 });
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {

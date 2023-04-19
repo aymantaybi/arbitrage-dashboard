@@ -108,6 +108,15 @@ const instance = {
       ],
     },
   },
+  configuration: {
+    distributions: [
+      {
+        id: 0,
+        maxQuantity: 1000000,
+        minROI: 0.001,
+      },
+    ],
+  },
 };
 
 export default {

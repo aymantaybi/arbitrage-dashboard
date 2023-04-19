@@ -66,6 +66,7 @@ type Status {
 }
 
 type Distribution {
+  id: Int
   minROI: Float
   maxQuantity: Int
 }

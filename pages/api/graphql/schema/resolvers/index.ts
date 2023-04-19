@@ -1,5 +1,6 @@
 import {
   ApolloClient,
+  DefaultOptions,
   HttpLink,
   InMemoryCache,
   NormalizedCacheObject,
@@ -14,6 +15,7 @@ import {
   INSTANCE_UPDATE,
   START_INSTANCE,
   STOP_INSTANCE,
+  UPDATE_INSTANCE,
 } from '../../../../../constants';
 import { SSELink } from '../../../../../helpers';
 import { LightInstance } from '../../../../../interfaces';
@@ -38,9 +40,20 @@ getDomainEnvVariables('ARBITRAGE_MANAGER_').forEach(([key, uri]) => {
     sseLink,
     httpLink
   );
+  const defaultOptions: DefaultOptions = {
+    watchQuery: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'ignore',
+    },
+    query: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'all',
+    },
+  };
   chainIdToClientMap[chainId] = new ApolloClient({
     link,
-    cache: new InMemoryCache(),
+    defaultOptions,
+    cache: new InMemoryCache({ addTypename: false }),
   });
 });
 
@@ -91,6 +104,24 @@ export const resolvers = {
         variables,
       });
       return data?.stopInstance;
+    },
+    updateInstance: async (
+      _: unknown,
+      args: { chainId: number; id: string; configuration: LightInstance.Configuration }
+    ) => {
+      const { chainId, id, configuration } = args;
+      const client = chainIdToClientMap[chainId];
+      if (!client) return new GraphQLError(`chainId ${chainId} is not supported.`);
+      const mutation = UPDATE_INSTANCE;
+      const variables = { chainId, id, configuration };
+      const { data } = await client.mutate<
+        { updateInstance: LightInstance },
+        { chainId: number; id: string; configuration: LightInstance.Configuration }
+      >({
+        mutation,
+        variables,
+      });
+      return data?.updateInstance;
     },
   },
   Subscription: {

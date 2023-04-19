@@ -1,29 +1,3 @@
-export interface Market {
-  baseToken: Market.Token;
-  quoteToken: Market.Token;
-  symbol: string;
-  paths: Market.Path[];
-}
-
-export namespace Market {
-  export interface Token {
-    symbol: string;
-    address: string;
-  }
-  export interface Path {
-    tokens: string[];
-    pairs: string[];
-    router: string;
-  }
-}
-
-export interface Status {
-  active: boolean;
-  marginBalances: MarginBalance[];
-  marginOpenOrders: MarginOpenOrder[];
-  onChainBalances: OnChainBalances;
-}
-
 export interface MarginBalance {
   asset: string;
   free: string;
@@ -64,6 +38,47 @@ export interface TokenBalance {
 export interface LightInstance {
   id: string;
   chainId: number;
-  market: Market;
-  status: Status;
+  market: LightInstance.Market;
+  status: LightInstance.Status;
+  configuration: LightInstance.Configuration;
+}
+
+export namespace LightInstance {
+  export interface Market {
+    baseToken: Market.Token;
+    quoteToken: Market.Token;
+    symbol: string;
+    paths: Market.Path[];
+  }
+
+  export namespace Market {
+    export interface Token {
+      symbol: string;
+      address: string;
+    }
+    export interface Path {
+      tokens: string[];
+      pairs: string[];
+      router: string;
+    }
+  }
+
+  export interface Status {
+    active: boolean;
+    marginBalances: MarginBalance[];
+    marginOpenOrders: MarginOpenOrder[];
+    onChainBalances: OnChainBalances;
+  }
+
+  export namespace Configuration {
+    export interface Distribution {
+      id: number;
+      minROI: number;
+      maxQuantity: number;
+    }
+  }
+
+  export interface Configuration {
+    distributions: Configuration.Distribution[];
+  }
 }

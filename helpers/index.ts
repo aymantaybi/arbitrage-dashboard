@@ -8,6 +8,7 @@ export function getTokenIconSrc(symbol: string) {
   if (symbol === 'ETH') return 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png';
   if (symbol === 'USDC') return 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png';
   if (symbol === 'WRON') return 'https://s2.coinmarketcap.com/static/img/coins/64x64/14101.png';
+  if (symbol === 'AXS') return 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png';
   return './question-mark.png';
 }
 

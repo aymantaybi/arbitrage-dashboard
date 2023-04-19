@@ -1,12 +1,29 @@
-import { Flex, Image, Tabs, Table, Select, ActionIcon } from '@mantine/core';
+import {
+  Flex,
+  Image,
+  Tabs,
+  Table,
+  Select,
+  ActionIcon,
+  Stack,
+  Text,
+  NumberInput,
+} from '@mantine/core';
 import {
   IconCircleFilled,
   IconExchange,
   IconFileInvoice,
   IconX,
   IconWallet,
+  IconSettings,
+  IconEdit,
+  IconDeviceFloppy,
+  IconSquarePlus,
+  IconSquareX,
 } from '@tabler/icons-react';
 import { Dispatch, SetStateAction, useState } from 'react';
+import { useToggle } from '@mantine/hooks';
+import { MutationFunctionOptions, DefaultContext, ApolloCache } from '@apollo/client';
 import { getChainIconSrc, getTokenIconSrc } from '../../helpers';
 import { LightInstance, MarginOpenOrder } from '../../interfaces';
 import { InstanceDetail } from '../InstanceCard/InstanceCard';
@@ -190,7 +207,7 @@ function InstanceMarginOpenOrders(props: InstanceMarginOpenOrdersProps) {
         <td>{symbol}</td>
         <td>{type}</td>
         <td color={side === 'BUY' ? 'green' : 'red'}>{side}</td>
-        <td>{price}</td>
+        <td>{Number(price)}</td>
         <td>{Number(origQty)}</td>
         <td>{Number(executedQty)}</td>
       </tr>
@@ -215,13 +232,209 @@ function InstanceMarginOpenOrders(props: InstanceMarginOpenOrdersProps) {
   );
 }
 
+interface InstanceConfigurationProps {
+  selectedInstance: LightInstance;
+  updateInstance: (
+    options?:
+      | MutationFunctionOptions<
+          {
+            updateInstance: LightInstance;
+          },
+          {
+            chainId: number;
+            id: string;
+            configuration: Omit<LightInstance.Configuration, 'distributions'> & {
+              distributions: Omit<LightInstance.Configuration.Distribution, 'id'>[];
+            };
+          },
+          DefaultContext,
+          ApolloCache<any>
+        >
+      | undefined
+  ) => Promise<any>;
+}
+
+function InstanceConfiguration(props: InstanceConfigurationProps) {
+  const { selectedInstance, updateInstance } = props;
+  const { configuration } = selectedInstance;
+  const { distributions } = configuration;
+
+  const [unsavedDistributions, setUnsavedDistributions] = useState(distributions);
+  const [addedDistribution, setAddedDistribution] = useState<{
+    minROI: number;
+    maxQuantity: number;
+  }>({ minROI: 0, maxQuantity: 0 });
+
+  const [isEditing, toggleIsEditing] = useToggle();
+
+  const handleDistributionChange =
+    (distribution: { id: number; minROI: number; maxQuantity: number }, key: string) =>
+    (value: number | '') => {
+      setUnsavedDistributions((current) =>
+        current.map((item) =>
+          item.id === distribution.id ? { ...item, [key]: Number(value) } : item
+        )
+      );
+    };
+
+  const handleSaveDistributions = () => {
+    const { id, chainId } = selectedInstance;
+    const newDistributions = unsavedDistributions
+      .filter(({ maxQuantity }) => maxQuantity > 0)
+      .map(({ maxQuantity, minROI }) => ({ maxQuantity, minROI }));
+    updateInstance({
+      variables: {
+        chainId,
+        id,
+        configuration: { ...configuration, distributions: newDistributions },
+      },
+      onCompleted(data) {
+        setUnsavedDistributions(data.updateInstance.configuration.distributions);
+      },
+    });
+  };
+
+  return (
+    <Stack w="100%" h="100%" spacing="xl" p="xl">
+      <Flex justify="flex-start" align="center" direction="row" wrap="wrap">
+        <Text size="xl" fw="bold">
+          Distributions
+        </Text>
+        <ActionIcon
+          color={isEditing ? 'blue' : 'green'}
+          variant="transparent"
+          onClick={() => {
+            if (isEditing) {
+              handleSaveDistributions();
+            }
+            toggleIsEditing();
+          }}
+        >
+          {isEditing ? <IconDeviceFloppy /> : <IconEdit />}
+        </ActionIcon>
+        {isEditing && (
+          <ActionIcon
+            color="red"
+            variant="transparent"
+            onClick={() => {
+              setUnsavedDistributions(distributions);
+              toggleIsEditing();
+            }}
+          >
+            <IconSquareX />
+          </ActionIcon>
+        )}
+      </Flex>
+      <Table
+        horizontalSpacing="xl"
+        verticalSpacing="xs"
+        highlightOnHover
+        withBorder
+        withColumnBorders
+      >
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Min ROI</th>
+            <th>Max Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {(isEditing ? unsavedDistributions : distributions).map((element) => (
+            <tr key={element.id}>
+              <td>{element.id}</td>
+              <td>
+                {isEditing ? (
+                  <NumberInput
+                    hideControls
+                    value={element.minROI}
+                    precision={5}
+                    onChange={handleDistributionChange(element, 'minROI')}
+                  />
+                ) : (
+                  <Text>{element.minROI}</Text>
+                )}
+              </td>
+              <td>
+                {isEditing ? (
+                  <NumberInput
+                    hideControls
+                    value={element.maxQuantity}
+                    onChange={handleDistributionChange(element, 'maxQuantity')}
+                  />
+                ) : (
+                  <Text>{element.maxQuantity}</Text>
+                )}
+              </td>
+            </tr>
+          ))}
+          {isEditing && (
+            <tr key="new">
+              <td>
+                <ActionIcon size="xl">
+                  <IconSquarePlus
+                    size="2.125rem"
+                    onClick={() => {
+                      setUnsavedDistributions((current) => [
+                        ...current,
+                        { ...addedDistribution, id: current.length },
+                      ]);
+                    }}
+                  />
+                </ActionIcon>
+              </td>
+              <td>
+                <NumberInput
+                  hideControls
+                  value={addedDistribution.minROI}
+                  precision={5}
+                  onChange={(value) => {
+                    setAddedDistribution((current) => ({ ...current, minROI: Number(value) }));
+                  }}
+                />
+              </td>
+              <td>
+                <NumberInput
+                  hideControls
+                  value={addedDistribution.maxQuantity}
+                  onChange={(value) => {
+                    setAddedDistribution((current) => ({ ...current, maxQuantity: Number(value) }));
+                  }}
+                />
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </Stack>
+  );
+}
+
 interface InstanceInformationProps {
   selectedInstance: LightInstance;
   setSelectedInstance: Dispatch<SetStateAction<LightInstance | undefined>>;
+  updateInstance: (
+    options?:
+      | MutationFunctionOptions<
+          {
+            updateInstance: LightInstance;
+          },
+          {
+            chainId: number;
+            id: string;
+            configuration: Omit<LightInstance.Configuration, 'distributions'> & {
+              distributions: Omit<LightInstance.Configuration.Distribution, 'id'>[];
+            };
+          },
+          DefaultContext,
+          ApolloCache<any>
+        >
+      | undefined
+  ) => Promise<any>;
 }
 
 export function InstanceInformation(props: InstanceInformationProps) {
-  const { selectedInstance, setSelectedInstance } = props;
+  const { selectedInstance, setSelectedInstance, updateInstance } = props;
 
   return (
     <Flex w="100%" justify="flex-start" align="stretch" direction="column" wrap="wrap" gap="xl">
@@ -240,6 +453,9 @@ export function InstanceInformation(props: InstanceInformationProps) {
           <Tabs.Tab value="trades" icon={<IconExchange size="0.8rem" />}>
             Trades
           </Tabs.Tab>
+          <Tabs.Tab value="configuration" icon={<IconSettings size="0.8rem" />}>
+            Configuration
+          </Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="balances" pt="xs">
           <InstanceBalances data={selectedInstance} />
@@ -249,6 +465,12 @@ export function InstanceInformation(props: InstanceInformationProps) {
         </Tabs.Panel>
         <Tabs.Panel value="trades" pt="xs">
           Trades Tab
+        </Tabs.Panel>
+        <Tabs.Panel value="configuration" pt="xs">
+          <InstanceConfiguration
+            selectedInstance={selectedInstance}
+            updateInstance={updateInstance}
+          />
         </Tabs.Panel>
       </Tabs>
     </Flex>
