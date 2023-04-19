@@ -1,8 +1,9 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { InstanceCard } from './InstanceCard';
+import { LightInstance } from '../../interfaces';
 
-const instance = {
+const instance: LightInstance = {
   id: '73752229-467d-45cc-9ae5-969a4f4a9d5e',
   chainId: 2020,
   market: {
@@ -107,6 +108,15 @@ const instance = {
         },
       ],
     },
+  },
+  configuration: {
+    distributions: [
+      {
+        id: 0,
+        minROI: 0.001,
+        maxQuantity: 100,
+      },
+    ],
   },
 };
 
