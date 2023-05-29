@@ -1,26 +1,27 @@
-export interface MarginBalance {
-  asset: string;
-  free: string;
-  locked: string;
+import Decimal from 'decimal.js';
+
+export interface Order {
+  orderId: string;
+  clientOrderId: string;
+  originalQuantity: Decimal;
+  executedQuantity: Decimal;
+  symbol: string;
+  price: Decimal;
+  side: 'BUY' | 'SELL';
+  status: 'NEW' | 'CANCELED' | 'FILLED' | 'PARTIALLY_FILLED';
+  updateTime: number;
 }
 
-export interface MarginOpenOrder {
-  clientOrderId: string;
-  cummulativeQuoteQty: string;
-  executedQty: string;
-  icebergQty: string;
-  isWorking: boolean;
-  orderId: number;
-  origQty: string;
-  price: string;
-  side: string;
-  status: string;
-  stopPrice: string;
+export interface IsolatedPosition {
   symbol: string;
-  isIsolated: boolean;
-  time: number;
-  timeInForce: string;
-  type: string;
+  amount: Decimal;
+  updateTime: number;
+}
+
+export interface Balance {
+  asset: string;
+  free: Decimal;
+  locked: Decimal;
   updateTime: number;
 }
 
@@ -65,9 +66,10 @@ export namespace LightInstance {
 
   export interface Status {
     active: boolean;
-    marginBalances: MarginBalance[];
-    marginOpenOrders: MarginOpenOrder[];
+    exchangeBalances: Balance[];
+    openOrders: Order[];
     onChainBalances: OnChainBalances;
+    exchangePositions: IsolatedPosition[];
   }
 
   export namespace Configuration {

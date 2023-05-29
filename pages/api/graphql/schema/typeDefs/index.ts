@@ -3,6 +3,16 @@ scalar JSON
 scalar JSONObject
 scalar BigInt
 
+enum ExchangeAccountType {
+  MARGIN
+  FUTURES
+}
+
+type ExchangeAccount {
+  exchange: String
+  type: ExchangeAccountType
+}
+
 type Token {
   symbol: String
   address: String
@@ -32,37 +42,36 @@ type OnChainBalances {
   tokens: [TokenBalance]
 }
 
-type MarginBalance {
+type Balance {
   asset: String
   free: String
   locked: String
 }
 
-type MarginOpenOrder {
+type Position {
+  symbol: String
+  amount: String
+  updateTime: String
+}
+
+type OpenOrder {
+  orderId: String
   clientOrderId: String
-  cummulativeQuoteQty: String
-  executedQty: String
-  icebergQty: String
-  isWorking: Boolean
-  orderId: Int
-  origQty: String
+  originalQuantity: String
+  executedQuantity: String
+  symbol: String
   price: String
   side: String
   status: String
-  stopPrice: String
-  symbol: String
-  isIsolated: Boolean
-  time: BigInt
-  timeInForce: String
-  type: String
-  updateTime: BigInt
+  updateTime: String
 }
 
 type Status {
   active: Boolean
   onChainBalances: OnChainBalances
-  marginBalances: [MarginBalance]
-  marginOpenOrders: [MarginOpenOrder]
+  exchangeBalances: [Balance]
+  exchangePositions: [Position]
+  openOrders: [OpenOrder]
 }
 
 type Distribution {
@@ -73,6 +82,7 @@ type Distribution {
 
 type Configuration {
   distributions: [Distribution]
+  account: ExchangeAccount
 }
 
 type Instance {
@@ -85,6 +95,11 @@ type Instance {
 
 type Query {
   instances(chainId: Int): [Instance]
+}
+
+input ExchangeAccountInput {
+  exchange: String
+  type: ExchangeAccountType
 }
 
 input TokenInput {
@@ -118,6 +133,7 @@ input DistributionInput {
 
 input ConfigurationInput {
   distributions: [DistributionInput]
+  account: ExchangeAccountInput
 }
 
 type Mutation {

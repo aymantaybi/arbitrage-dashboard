@@ -5,41 +5,6 @@ export const GET_INSTANCES = gql`
     instances(chainId: $chainId) {
       chainId
       id
-      status {
-        active
-        marginBalances {
-          asset
-          free
-          locked
-        }
-        marginOpenOrders {
-          clientOrderId
-          cummulativeQuoteQty
-          executedQty
-          icebergQty
-          isIsolated
-          isWorking
-          orderId
-          origQty
-          price
-          side
-          status
-          stopPrice
-          symbol
-          time
-          timeInForce
-          type
-          updateTime
-        }
-        onChainBalances {
-          account
-          tokens {
-            address
-            balance
-            symbol
-          }
-        }
-      }
       market {
         baseToken {
           address
@@ -56,11 +21,47 @@ export const GET_INSTANCES = gql`
         }
         symbol
       }
+      status {
+        active
+        onChainBalances {
+          account
+          tokens {
+            address
+            balance
+            symbol
+          }
+        }
+        openOrders {
+          clientOrderId
+          executedQuantity
+          orderId
+          originalQuantity
+          price
+          side
+          status
+          symbol
+          updateTime
+        }
+        exchangePositions {
+          amount
+          symbol
+          updateTime
+        }
+        exchangeBalances {
+          asset
+          free
+          locked
+        }
+      }
       configuration {
         distributions {
           id
           maxQuantity
           minROI
+        }
+        account {
+          exchange
+          type
         }
       }
     }
@@ -68,34 +69,20 @@ export const GET_INSTANCES = gql`
 `;
 
 export const START_INSTANCE = gql`
-  mutation StartInstance($chainId: Int, $id: String) {
+  mutation StartInstance($id: String, $chainId: Int) {
     startInstance(chainId: $chainId, id: $id) {
       chainId
       id
       status {
         active
-        marginBalances {
+        exchangeBalances {
           asset
           free
           locked
         }
-        marginOpenOrders {
-          clientOrderId
-          cummulativeQuoteQty
-          executedQty
-          icebergQty
-          isIsolated
-          isWorking
-          orderId
-          origQty
-          price
-          side
-          status
-          stopPrice
+        exchangePositions {
+          amount
           symbol
-          time
-          timeInForce
-          type
           updateTime
         }
         onChainBalances {
@@ -105,6 +92,28 @@ export const START_INSTANCE = gql`
             balance
             symbol
           }
+        }
+        openOrders {
+          clientOrderId
+          executedQuantity
+          orderId
+          originalQuantity
+          price
+          side
+          status
+          symbol
+          updateTime
+        }
+      }
+      configuration {
+        account {
+          exchange
+          type
+        }
+        distributions {
+          id
+          maxQuantity
+          minROI
         }
       }
       market {
@@ -122,58 +131,27 @@ export const START_INSTANCE = gql`
           symbol
         }
         symbol
-      }
-      configuration {
-        distributions {
-          id
-          maxQuantity
-          minROI
-        }
       }
     }
   }
 `;
 
 export const STOP_INSTANCE = gql`
-  mutation StopInstance($chainId: Int, $id: String) {
+  mutation StopInstance($id: String, $chainId: Int) {
     stopInstance(chainId: $chainId, id: $id) {
       chainId
-      id
-      status {
-        active
-        marginBalances {
-          asset
-          free
-          locked
-        }
-        marginOpenOrders {
-          clientOrderId
-          cummulativeQuoteQty
-          executedQty
-          icebergQty
-          isIsolated
-          isWorking
-          orderId
-          origQty
-          price
-          side
-          status
-          stopPrice
-          symbol
-          time
-          timeInForce
+      configuration {
+        account {
+          exchange
           type
-          updateTime
         }
-        onChainBalances {
-          account
-          tokens {
-            address
-            balance
-            symbol
-          }
+        distributions {
+          id
+          maxQuantity
+          minROI
         }
       }
+      id
       market {
         baseToken {
           address
@@ -190,11 +168,36 @@ export const STOP_INSTANCE = gql`
         }
         symbol
       }
-      configuration {
-        distributions {
-          id
-          maxQuantity
-          minROI
+      status {
+        active
+        exchangeBalances {
+          asset
+          free
+          locked
+        }
+        exchangePositions {
+          amount
+          symbol
+          updateTime
+        }
+        onChainBalances {
+          account
+          tokens {
+            address
+            balance
+            symbol
+          }
+        }
+        openOrders {
+          clientOrderId
+          executedQuantity
+          orderId
+          originalQuantity
+          price
+          side
+          status
+          symbol
+          updateTime
         }
       }
     }
@@ -206,39 +209,15 @@ export const INSTANCE_UPDATE = gql`
     instanceUpdate(chainId: $chainId) {
       chainId
       id
-      status {
-        active
-        marginBalances {
-          asset
-          free
-          locked
-        }
-        marginOpenOrders {
-          clientOrderId
-          cummulativeQuoteQty
-          executedQty
-          icebergQty
-          isIsolated
-          isWorking
-          orderId
-          origQty
-          price
-          side
-          status
-          stopPrice
-          symbol
-          time
-          timeInForce
+      configuration {
+        account {
+          exchange
           type
-          updateTime
         }
-        onChainBalances {
-          account
-          tokens {
-            address
-            balance
-            symbol
-          }
+        distributions {
+          id
+          maxQuantity
+          minROI
         }
       }
       market {
@@ -257,11 +236,36 @@ export const INSTANCE_UPDATE = gql`
         }
         symbol
       }
-      configuration {
-        distributions {
-          id
-          maxQuantity
-          minROI
+      status {
+        active
+        exchangeBalances {
+          asset
+          free
+          locked
+        }
+        exchangePositions {
+          amount
+          symbol
+          updateTime
+        }
+        onChainBalances {
+          account
+          tokens {
+            address
+            balance
+            symbol
+          }
+        }
+        openOrders {
+          clientOrderId
+          executedQuantity
+          orderId
+          originalQuantity
+          price
+          side
+          status
+          symbol
+          updateTime
         }
       }
     }
@@ -269,11 +273,7 @@ export const INSTANCE_UPDATE = gql`
 `;
 
 export const UPDATE_INSTANCE = gql`
-  mutation UpdateInstance(
-    $chainId: Int
-    $id: String
-    $configuration: ConfigurationInput
-  ) {
+  mutation UpdateInstance($chainId: Int, $id: String, $configuration: ConfigurationInput) {
     updateInstance(chainId: $chainId, id: $id, configuration: $configuration) {
       chainId
       id

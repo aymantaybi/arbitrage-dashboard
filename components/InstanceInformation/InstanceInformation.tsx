@@ -25,7 +25,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { useToggle } from '@mantine/hooks';
 import { MutationFunctionOptions, DefaultContext, ApolloCache } from '@apollo/client';
 import { getChainIconSrc, getTokenIconSrc } from '../../helpers';
-import { LightInstance, MarginOpenOrder } from '../../interfaces';
+import { Balance, LightInstance, Order } from '../../interfaces';
 import { InstanceDetail } from '../InstanceCard/InstanceCard';
 import PairIcon from '../PairIcon/PairIcon';
 import { TokenIconContainer } from '../TokenIconContainer/TokenIconContainer';
@@ -80,7 +80,7 @@ function InstanceInformationHeader(props: InstanceInformationHeaderProps) {
 }
 
 interface InstanceMarginBalancesProps {
-  balances: Array<{ asset: string; free: string; locked: string }>;
+  balances: Balance[];
 }
 
 function InstanceMarginBalances(props: InstanceMarginBalancesProps) {
@@ -174,7 +174,7 @@ function InstanceBalances(props: InstanceBalancesProps) {
         size="xs"
       />
       {balanceType === 'Margin' ? (
-        <InstanceMarginBalances balances={data.status.marginBalances} />
+        <InstanceMarginBalances balances={data.status.exchangeBalances} />
       ) : (
         <InstanceOnChainBalances
           tokens={data.status.onChainBalances.tokens}
@@ -186,17 +186,17 @@ function InstanceBalances(props: InstanceBalancesProps) {
 }
 
 interface InstanceMarginOpenOrdersProps {
-  marginOpenOrders: MarginOpenOrder[];
+  openOrder: Order[];
 }
 
 function InstanceMarginOpenOrders(props: InstanceMarginOpenOrdersProps) {
-  const { marginOpenOrders } = props;
+  const { openOrder } = props;
 
-  const rows = marginOpenOrders.map(
-    ({ clientOrderId, time, symbol, type, side, price, origQty, executedQty }) => (
+  const rows = openOrder.map(
+    ({ clientOrderId, updateTime, symbol, side, price, originalQuantity, executedQuantity }) => (
       <tr key={clientOrderId}>
         <td>
-          {new Date(time).toLocaleDateString('en-us', {
+          {new Date(updateTime).toLocaleDateString('en-us', {
             month: 'short',
             day: 'numeric',
             hour: 'numeric',
@@ -205,11 +205,11 @@ function InstanceMarginOpenOrders(props: InstanceMarginOpenOrdersProps) {
           })}
         </td>
         <td>{symbol}</td>
-        <td>{type}</td>
+        <td>LIMIT</td>
         <td color={side === 'BUY' ? 'green' : 'red'}>{side}</td>
         <td>{Number(price)}</td>
-        <td>{Number(origQty)}</td>
-        <td>{Number(executedQty)}</td>
+        <td>{Number(originalQuantity)}</td>
+        <td>{Number(executedQuantity)}</td>
       </tr>
     )
   );
@@ -448,7 +448,7 @@ export function InstanceInformation(props: InstanceInformationProps) {
             Balances
           </Tabs.Tab>
           <Tabs.Tab value="orders" icon={<IconFileInvoice size="0.8rem" />}>
-            {`Open Orders (${selectedInstance.status.marginOpenOrders.length})`}
+            {`Open Orders (${selectedInstance.status.openOrders.length})`}
           </Tabs.Tab>
           <Tabs.Tab value="trades" icon={<IconExchange size="0.8rem" />}>
             Trades
@@ -461,7 +461,7 @@ export function InstanceInformation(props: InstanceInformationProps) {
           <InstanceBalances data={selectedInstance} />
         </Tabs.Panel>
         <Tabs.Panel value="orders" pt="xs">
-          <InstanceMarginOpenOrders marginOpenOrders={selectedInstance.status.marginOpenOrders} />
+          <InstanceMarginOpenOrders openOrder={selectedInstance.status.openOrders} />
         </Tabs.Panel>
         <Tabs.Panel value="trades" pt="xs">
           Trades Tab
